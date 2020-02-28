@@ -16,41 +16,40 @@ import java.util.Map;
 @SpringBootApplication
 public class SsecResSvrApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SsecResSvrApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SsecResSvrApplication.class, args);
+    }
 
 }
 
 @EnableWebSecurity
 class SecurityConfig extends WebSecurityConfigurerAdapter {
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.authorizeRequests().mvcMatchers("/claims").hasAuthority("SCOPE_openid")
-				.and()
-				.authorizeRequests().mvcMatchers("/email").hasAuthority("SCOPE_email")
-				.and()
-				.oauth2ResourceServer().jwt();
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .mvcMatchers("/resources/claims/**").hasAuthority("SCOPE_openid")
+                .mvcMatchers("/resources/email/**").hasAuthority("SCOPE_email")
+                .and().oauth2ResourceServer().jwt();
+    }
 }
 
 
 @RestController
 @RequestMapping("/resources")
 class ResourceController {
-	@GetMapping("/something")
-	String getSomething() {
-		return "This is really something!";
-	}
+    @GetMapping("/something")
+    String getSomething() {
+        return "This is really something!";
+    }
 
-	@GetMapping("/claims")
-	Map<String, Object> getClaims(@AuthenticationPrincipal Jwt jwt) {
-		return jwt.getClaims();
-	}
+    @GetMapping("/claims")
+    Map<String, Object> getClaims(@AuthenticationPrincipal Jwt jwt) {
+        return jwt.getClaims();
+    }
 
-	@GetMapping("/email")
-	String getSubject(@AuthenticationPrincipal Jwt jwt) {
-		return jwt.getSubject();
-	}
+    @GetMapping("/email")
+    String getSubject(@AuthenticationPrincipal Jwt jwt) {
+        return jwt.getSubject();
+    }
 }
